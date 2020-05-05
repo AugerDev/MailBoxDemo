@@ -13,11 +13,14 @@ namespace MailboxIntegration.Controllers
 {
     public class AccountController : Controller
     {
+        public void Account()
+        {
+        }
         public void SignIn()
         {
             if (!Request.IsAuthenticated)
             {
-                // Signal OWIN to send an authorization request to Azure
+               // Signal OWIN to send an authorization request to Azure
                 Request.GetOwinContext().Authentication.Challenge(
                     new AuthenticationProperties { RedirectUri = "/" },
                     OpenIdConnectAuthenticationDefaults.AuthenticationType);

@@ -1,20 +1,25 @@
-﻿using MailboxIntegration.Helpers;
-using MailboxIntegration.TokenStorage;
-using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
-using System;
-using System.Collections.Generic;
+using Microsoft.Identity.Client;
 using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Owin;
+using Microsoft.Graph;
+using System.Net.Http.Headers;
+using MailboxIntegration.TokenStorage;
+using MailboxIntegration.Helpers;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
+using Microsoft.Owin.Security.Interop;
+using System.Web.Helpers;
 
 namespace MailboxIntegration
 {
@@ -27,8 +32,8 @@ namespace MailboxIntegration
         public void ConfigureAuth(IAppBuilder app)
         {
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
             app.UseCookieAuthentication(new CookieAuthenticationOptions());
+
             app.UseOpenIdConnectAuthentication(
                 new OpenIdConnectAuthenticationOptions
                 {
@@ -50,6 +55,7 @@ namespace MailboxIntegration
                 }
             );
         }
+
 
         private static Task OnAuthenticationFailedAsync(AuthenticationFailedNotification<OpenIdConnectMessage,
           OpenIdConnectAuthenticationOptions> notification)
@@ -86,7 +92,7 @@ namespace MailboxIntegration
                 var cachedUser = new CachedUser()
                 {
                     DisplayName = userDetails.DisplayName,
-                    Email = (string.IsNullOrEmpty(userDetails.Mail) ?  userDetails.UserPrincipalName : userDetails.Mail),
+                    Email = (string.IsNullOrEmpty(userDetails.Mail) ? userDetails.UserPrincipalName : userDetails.Mail),
                     Avatar = string.Empty
                 };
 

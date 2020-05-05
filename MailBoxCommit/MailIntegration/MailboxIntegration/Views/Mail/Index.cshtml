@@ -36,16 +36,18 @@
     }
 
     function getMailboxInformation(sharedMailId) {
+        debugger;
+        var url = '@Url.Action("MailInboxSearch", "Mail",new {sharedMailId = "id" })'.replace("id", sharedMailId);
         $.ajax({
             type: "GET",
-            url: "/Mail/MailInboxSearch?sharedMailId=" + sharedMailId,
+            url: url, // "/Mail/MailInboxSearch?sharedMailId=" + sharedMailId,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
                 $("#result").html(response.view);
             },
             failure: function (response) {
-                 swal.fire({
+                swal.fire({
                     text: 'Invalid Email Address',
                     title: 'Failed!',
                     icon: 'warning',
@@ -56,7 +58,7 @@
                     animation: true,
                     allowEscapeKey: false,
                     allowOutsideClick: false
-                 }).then(function () {
+                }).then(function () {
                 });
             },
             error: function (response) {
@@ -71,7 +73,7 @@
                     animation: true,
                     allowEscapeKey: false,
                     allowOutsideClick: false
-                 }).then(function () {
+                }).then(function () {
                 });
             }
         });

@@ -97,6 +97,50 @@ namespace MailboxIntegration.Helpers
         {
             try
             {
+                HttpCookie myCookie = HttpContext.Current.Request.Cookies["myCookie"];
+                return new GraphServiceClient(
+                   new DelegateAuthenticationProvider(
+                       async (requestMessage) =>
+                       {
+                           requestMessage.Headers.Authorization =
+                               new AuthenticationHeaderValue("Bearer", myCookie.Value);
+                       }));
+             //   return new GraphServiceClient(
+             //new DelegateAuthenticationProvider(
+             //    async (requestMessage) =>
+             //    {
+                     //var idClient = ConfidentialClientApplicationBuilder.Create(appId)
+                     //    .WithRedirectUri(redirectUri)
+                     //    .WithClientSecret(appSecret)
+                     //    .Build();
+
+                     //var tokenStore = new SessionStore(idClient.UserTokenCache,
+                     //        HttpContext.Current, ClaimsPrincipal.Current);
+
+                     //var accounts = await idClient.GetAccountsAsync();
+
+                     //// By calling this here, the token can be refreshed
+                     //// if it's expired right before the Graph call is made
+                     //var scopes = graphScopes.Split(' ');
+                     //var result = await idClient.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
+                     //    .ExecuteAsync();
+
+                 //    requestMessage.Headers.Authorization =
+                 //        new AuthenticationHeaderValue("Bearer", myCookie.Value);
+                 //}));
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public static GraphServiceClient GetAuthenticatedClient(string chk)
+        {
+            try
+            {
                 return new GraphServiceClient(
              new DelegateAuthenticationProvider(
                  async (requestMessage) =>
@@ -118,7 +162,7 @@ namespace MailboxIntegration.Helpers
                          .ExecuteAsync();
 
                      requestMessage.Headers.Authorization =
-                         new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                         new AuthenticationHeaderValue("Bearer", chk);
                  }));
             }
             catch (Exception ex)

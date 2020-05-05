@@ -17,11 +17,9 @@ namespace DemoWebform
         }
         protected void btnLaunch_Click(object sender, EventArgs e)
         {
-            if (!Request.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
-                HttpContext.Current.GetOwinContext().Authentication.Challenge(
-                  new AuthenticationProperties { RedirectUri = "/" },
-                  OpenIdConnectAuthenticationDefaults.AuthenticationType);
+                Response.Redirect("https://www.mailboxintegration.com:443/Mail"); 
             }
         }
     }

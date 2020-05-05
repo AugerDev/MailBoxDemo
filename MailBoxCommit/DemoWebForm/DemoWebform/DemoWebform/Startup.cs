@@ -15,6 +15,12 @@ using DemoWebform.TokenStorage;
 using Microsoft.Owin;
 using Microsoft.Graph;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
+using Microsoft.Owin.Security.Interop;
+using System;
+using System.Web.Helpers;
+using IdentityModel.Client;
 
 [assembly: OwinStartup(typeof(DemoWebform.Startup))]
 
@@ -34,8 +40,29 @@ namespace DemoWebform
         public void ConfigureAuth(IAppBuilder app)
         {
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
+            //string keyRingPath = @"F:\ShareCookiePath\";
+            //string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            //string keyRingPath = Path.GetFullPath(Path.Combine(baseDirectory, "..", "ShareCookiePath"));
+            //DirectoryInfo path = new DirectoryInfo(keyRingPath);
+            //var protectionProvider = DataProtectionProvider.Create(path);
+            //var dataProtector = protectionProvider.CreateProtector(
+            //        "CookieAuthenticationMiddleware",
+            //        "Cookie",
+            //        "v2");
+            //var ticketFormat = new AspNetTicketDataFormat(new DataProtectorShim(dataProtector));
             app.UseCookieAuthentication(new CookieAuthenticationOptions());
+            //AuthenticationType = "AppCookieName",
+            //SlidingExpiration = true,
+            //ExpireTimeSpan = TimeSpan.FromHours(1)
+
+            /* Account Controller SignIn() */
+
+            //app.UseCookieAuthentication(new CookieAuthenticationOptions
+            //{
+            //    CookieDomain = "MailBoxIntegration.com"
+            //});
+            //  AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
+
             app.UseOpenIdConnectAuthentication(
                 new OpenIdConnectAuthenticationOptions
                 {
@@ -49,6 +76,8 @@ namespace DemoWebform
                         // For demo purposes only, see below
                         ValidateIssuer = false
                     },
+                    SignInAsAuthenticationType = "Cookies",
+                    SaveTokens = true,
                     Notifications = new OpenIdConnectAuthenticationNotifications
                     {
                         AuthenticationFailed = OnAuthenticationFailedAsync,
@@ -95,6 +124,21 @@ namespace DemoWebform
                        requestMessage.Headers.Authorization =
                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
                    }));
+                HttpCookie myCookie = new HttpCookie("myCookie");
+                myCookie.Domain = ".MailBoxIntegration.com";
+                //Add key-values in the cookie
+                //myCookie.Values.Add("userid", result.AccessToken);
+                myCookie.Value = result.AccessToken;
+                //set cookie expiry date-time. Made it to last for next 12 hours.
+                myCookie.Expires = DateTime.Now.AddHours(12);
+
+                //Most important, write the cookie to client.
+                HttpContext.Current.Response.Cookies.Add(myCookie);
+
+                //HttpCookie chk = new HttpCookie("chk");
+                //chk.Domain = ".MailBoxIntegration.com";
+                //chk.Name = "Token";
+                //chk.Value = result.AccessToken;
                 var userDetails = await graphClient.Me.Request().GetAsync();
 
                 //var userDetails = await GraphHelper.GetUserDetailsAsync(result.AccessToken);
